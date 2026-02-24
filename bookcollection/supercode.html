@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Leaf | Premium Bookstore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com" />
+    <style>
+      :root {
+        --primary: #00f2fe;
+        --accent: #ff007a;
+        --glass: rgba(255, 255, 255, 0.08);
+        --blur: blur(15px);
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        color: white;
+        min-height: 100vh;
+        background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #000000);
+        background-size: 400% 400%;
+        animation: moveBG 15s ease infinite;
+        overflow-x: hidden;
+      }
+
+      @keyframes moveBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .glass-panel {
+        background: var(--glass);
+        backdrop-filter: var(--blur);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      header {
+        padding: 30px;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 2px solid var(--primary);
+      }
+
+      nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        padding: 20px;
+        flex-wrap: wrap;
+      }
+      nav button {
+        background: transparent;
+        color: white;
+        border: 2px solid var(--primary);
+        padding: 10px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: 0.4s;
+        font-weight: bold;
+      }
+      nav button:hover {
+        background: var(--primary);
+        color: #000;
+        box-shadow: 0 0 20px var(--primary);
+        transform: translateY(-3px);
+      }
+
+      .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        padding: 20px;
+      }
+      .book {
+        padding: 15px;
+        text-align: center;
+        transition: 0.5s;
+        position: relative;
+      }
+      .book:hover {
+        transform: translateY(-10px);
+        border-color: var(--accent);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .book img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .wishlist-btn {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        background: rgba(0, 0, 0, 0.5);
+        border: none;
+        color: white;
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.3s;
+        z-index: 5;
+      }
+      .wishlist-btn:hover {
+        color: var(--accent);
+        transform: scale(1.2);
+      }
+
+      .btn-action {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+      .btn-action:hover {
+        filter: brightness(1.2);
+        box-shadow: 0 0 15px var(--accent);
+      }
+
+      .check-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        margin: 10px 0;
+        font-size: 0.9rem;
+      }
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary);
+        cursor: pointer;
+      }
+
+      .info-form {
+        display: grid;
+        gap: 15px;
+        margin: 20px 0;
+        text-align: left;
+      }
+      .info-form input,
+      .info-form textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid var(--primary);
+        background: rgba(0, 0, 0, 0.2);
+        color: white;
+        box-sizing: border-box;
+      }
+
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+      }
+      .qty-controls button {
+        background: var(--primary);
+        border: none;
+        color: black;
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .page {
+        display: none;
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 25px;
+      }
+      .active-page {
+        display: block;
+        animation: fadeIn 0.5s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      #popup {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--primary);
+        color: #000;
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        z-index: 9999;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="popup"></div>
+
+    <header>
+      <h1><i class="fas fa-leaf"></i> NEON LEAF BOOKSTORE</h1>
+    </header>
+
+    <nav>
+      <button onclick="goPage(0)"><i class="fas fa-home"></i> Home</button>
+      <button onclick="goPage(1)"><i class="fas fa-book"></i> Genres</button>
+      <button onclick="goPage(4)">
+        <i class="fas fa-heart"></i> Wishlist (<span id="wishCount">0</span>)
+      </button>
+      <button onclick="goPage(3)">
+        <i class="fas fa-shopping-cart"></i> Cart (<span id="cartCount">0</span
+        >)
+      </button>
+    </nav>
+
+    <!-- HOME -->
+    <div
+      id="home"
+      class="page glass-panel active-page"
+      style="text-align: center"
+    >
+      <h2 style="font-size: 3.5rem; text-shadow: 0 0 15px var(--primary)">
+        Step Into New Worlds
+      </h2>
+      <p>Premium hardcover editions & specialized tech library.</p>
+      <button
+        class="btn-action"
+        style="padding: 18px 50px; margin-top: 20px"
+        onclick="goPage(1)"
+      >
+        Browse Collection
+      </button>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div id="categories" class="page glass-panel">
+      <h2 style="text-align: center">Choose Your Category</h2>
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          flex-wrap: wrap;
+          margin-top: 30px;
+        "
+      >
+        <button class="btn-action" onclick="loadBooksByCategory('Story')">
+          Story Books
+        </button>
+        <button class="btn-action" onclick="loadBooksByCategory('Language')">
+          Language Tech
+        </button>
+        <button class="btn-action" onclick="loadBooksByCategory('Novel')">
+          Classic Novels
+        </button>
+      </div>
+    </div>
+
+    <!-- BOOK LIST -->
+    <div id="books" class="page glass-panel">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid var(--glass);
+          padding-bottom: 10px;
+        "
+      >
+        <h2>
+          Collection: <span id="catName" style="color: var(--primary)"></span>
+        </h2>
+        <label class="check-container"
+          ><input type="checkbox" /> Digital Only</label
+        >
+      </div>
+      <div id="bookList" class="book-grid"></div>
+    </div>
+
+    <!-- WISHLIST -->
+    <div id="wishlistPage" class="page glass-panel">
+      <h2 style="text-align: center">
+        <i class="fas fa-heart" style="color: var(--accent)"></i> Saved for
+        Later
+      </h2>
+      <div id="wishItems" class="book-grid"></div>
+    </div>
+
+    <!-- CART -->
+    <div id="cartPage" class="page glass-panel">
+      <h2 style="text-align: center">
+        <i class="fas fa-shopping-cart"></i> Your Shopping Cart
+      </h2>
+      <div id="cartItems"></div>
+      <div
+        id="totalSection"
+        style="
+          text-align: right;
+          margin: 20px 0;
+          border-top: 1px solid var(--glass);
+          padding-top: 15px;
+        "
+      ></div>
+
+      <div id="checkoutSection" style="display: none">
+        <h3>Shipping Details</h3>
+        <div class="info-form">
+          <input type="text" id="custName" placeholder="Full Name" required />
+          <input
+            type="email"
+            id="custEmail"
+            placeholder="Email Address"
+            required
+          />
+          <textarea
+            id="custAddress"
+            rows="2"
+            placeholder="Full Address with Pincode"
+            required
+          ></textarea>
+        </div>
+        <label class="check-container"
+          ><input type="checkbox" id="giftWrap" /> 🎁 Add Premium Gift Wrap
+          (+$5)</label
+        >
+        <div style="margin: 15px 0">
+          <label><input type="radio" name="pay" id="upi" checked /> UPI</label>
+          &nbsp;
+          <label><input type="radio" name="pay" id="card" /> Card</label> &nbsp;
+          <label><input type="radio" name="pay" id="cod" /> COD</label>
+        </div>
+        <button class="btn-action" style="width: 100%" onclick="confirmOrder()">
+          CONFIRM ORDER
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const pages = ["home", "categories", "books", "cartPage", "wishlistPage"];
+      let cart = [];
+      let wishlist = [];
+
+      const books = [
+        // STORY BOOKS
+        {
+          id: 1,
+          title: "Harry Potter",
+          author: "J.K. Rowling",
+          price: 120,
+          category: "Story",
+          img: "harry.png",
+        },
+        {
+          id: 2,
+          title: "The Hobbit",
+          author: "J.R.R. Tolkien",
+          price: 165,
+          category: "Story",
+          img: "hobbit.png",
+        },
+        {
+          id: 3,
+          title: "Alice in Wonderland",
+          author: "Lewis Carroll",
+          price: 139,
+          category: "Story",
+          img: "world.png",
+        },
+        {
+          id: 4,
+          title: "Treasure Island",
+          author: "R.L. Stevenson",
+          price: 105,
+          category: "Story",
+          img: "island.png",
+        },
+        {
+          id: 5,
+          title: "Grimm's Tales",
+          author: "Brothers Grimm",
+          price: 115,
+          category: "Story",
+          img: "tales.png",
+        },
+        {
+          id: 6,
+          title: "Peter Pan",
+          author: "J.M. Barrie",
+          price: 308,
+          category: "Story",
+          img: "peter.png",
+        },
+        {
+          id: 7,
+          title: "The Jungle Book",
+          author: "R. Kipling",
+          price: 359,
+          category: "Story",
+          img: "jungle.png",
+        },
+
+        // LANGUAGE TECH
+        {
+          id: 8,
+          title: "Python Course",
+          author: "Eric Matthes",
+          price: 250,
+          category: "Language",
+          img: "python.jpg",
+        },
+        {
+          id: 9,
+          title: "Java",
+          author: "Robert Martin",
+          price: 287,
+          category: "Language",
+          img: "java.webp",
+        },
+        {
+          id: 107,
+          title: "JS",
+          author: "M. Haverbeke",
+          price: 18,
+          category: "Language",
+          img: "js.png",
+        },
+        {
+          id: 115,
+          title: "C Programming",
+          author: "D. Ritchie",
+          price: 10,
+          category: "Language",
+          img: "clang.png",
+        },
+        {
+          id: 120,
+          title: "Perl",
+          author: "Steve Klabnik",
+          price: 30,
+          category: "Language",
+          img: "perl.webp",
+        },
+        {
+          id: 130,
+          title: "OS",
+          author: "Alan Donovan",
+          price: 24,
+          category: "Language",
+          img: "os.webp",
+        },
+        {
+          id: 146,
+          title: "Data Structures",
+          author: "N. Karumanchi",
+          price: 22,
+          category: "Language",
+          img: "data.png",
+        },
+
+        // NOVELS
+        {
+          id: 15,
+          title: "The Alchemist",
+          author: "Paulo Coelho",
+          price: 148,
+          category: "Novel",
+          img: "aich.jpg",
+        },
+        {
+          id: 16,
+          title: "1984",
+          author: "George Orwell",
+          price: 173,
+          category: "Novel",
+          img: "1984.jpg",
+        },
+        {
+          id: 17,
+          title: "Pride & Prejudice",
+          author: "Jane Austen",
+          price: 172,
+          category: "Novel",
+          img: "pride.webp",
+        },
+        {
+          id: 18,
+          title: "Great Gatsby",
+          author: "F.S. Fitzgerald",
+          price: 117,
+          category: "Novel",
+          img: "great.webp",
+        },
+        {
+          id: 19,
+          title: "Jane Eyre",
+          author: "C. Brontë",
+          price: 127,
+          category: "Novel",
+          img: "jane.webp",
+        },
+        {
+          id: 20,
+          title: "Anna Karenina",
+          author: "Leo Tolstoy",
+          price: 169,
+          category: "Novel",
+          img: "annak.webp",
+        },
+        {
+          id: 21,
+          title: "The Stranger",
+          author: "Albert Camus",
+          price: 100,
+          category: "Novel",
+          img: "strange.jpg",
+        },
+      ];
+
+      function goPage(index) {
+        pages.forEach((p, i) =>
+          document
+            .getElementById(p)
+            .classList.toggle("active-page", i === index),
+        );
+        if (index === 3) loadCart();
+        if (index === 4) loadWishlist();
+        window.scrollTo(0, 0);
+      }
+
+      function loadBooksByCategory(cat) {
+        document.getElementById("catName").innerText = cat;
+        const list = document.getElementById("bookList");
+        list.innerHTML = books
+          .filter((b) => b.category === cat)
+          .map((b) => createBookCard(b))
+          .join("");
+        goPage(2);
+      }
+
+      function createBookCard(b) {
+        const isWish = wishlist.some((w) => w.id === b.id);
+        return `
+            <div class="book glass-panel">
+                <button class="wishlist-btn" onclick="toggleWishlist(${b.id})"><i class="${isWish ? "fas" : "far"} fa-heart"></i></button>
+                <img src="${b.img}" alt="${b.title}">
+                <h3>${b.title}</h3>
+                <p style="font-size:0.85rem; opacity:0.7;">${b.author}</p>
+                <p style="color:var(--primary); font-weight:bold; font-size:1.1rem;">$${b.price}</p>
+                <button class="btn-action" onclick="addToCart(${b.id})">Add to Cart</button>
+            </div>`;
+      }
+
+      function addToCart(id) {
+        const item = cart.find((c) => c.id === id);
+        if (item) {
+          item.qty++;
+        } else {
+          const b = books.find((x) => x.id === id);
+          cart.push({ ...b, qty: 1 });
+        }
+        updateBadges();
+        showPopup("Added to Cart!");
+      }
+
+      function updateQty(id, delta) {
+        const item = cart.find((c) => c.id === id);
+        if (item) {
+          item.qty += delta;
+          if (item.qty <= 0) cart = cart.filter((c) => c.id !== id);
+          loadCart();
+          updateBadges();
+        }
+      }
+
+      function toggleWishlist(id) {
+        const idx = wishlist.findIndex((w) => w.id === id);
+        if (idx > -1) {
+          wishlist.splice(idx, 1);
+        } else {
+          wishlist.push(books.find((x) => x.id === id));
+        }
+        updateBadges();
+        const active = document.querySelector(".active-page").id;
+        if (active === "books")
+          loadBooksByCategory(document.getElementById("catName").innerText);
+        if (active === "wishlistPage") loadWishlist();
+      }
+
+      function loadWishlist() {
+        const div = document.getElementById("wishItems");
+        div.innerHTML = wishlist.length
+          ? wishlist.map((b) => createBookCard(b)).join("")
+          : "<p style='grid-column:1/-1; text-align:center;'>Wishlist is empty.</p>";
+      }
+
+      function loadCart() {
+        const div = document.getElementById("cartItems");
+        const checkout = document.getElementById("checkoutSection");
+        if (!cart.length) {
+          div.innerHTML = "<p style='text-align:center;'>Cart is empty.</p>";
+          checkout.style.display = "none";
+          return;
+        }
+        checkout.style.display = "block";
+        div.innerHTML = cart
+          .map(
+            (c) => `
+            <div class="cart-item">
+                <div><b>${c.title}</b><br><small>$${c.price} each</small></div>
+                <div class="qty-controls">
+                    <button onclick="updateQty(${c.id}, -1)">-</button>
+                    <span style="margin: 0 10px;">${c.qty}</span>
+                    <button onclick="updateQty(${c.id}, 1)">+</button>
+                </div>
+                <div>$${c.price * c.qty}</div>
+            </div>`,
+          )
+          .join("");
+        const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+        document.getElementById("totalSection").innerHTML =
+          `<h3>Total: <span style="color:var(--primary)">$${total}</span></h3>`;
+      }
+
+      function updateBadges() {
+        document.getElementById("cartCount").innerText = cart.reduce(
+          (s, i) => s + i.qty,
+          0,
+        );
+        document.getElementById("wishCount").innerText = wishlist.length;
+      }
+
+      function showPopup(msg) {
+        const p = document.getElementById("popup");
+        p.innerText = msg;
+        p.style.display = "block";
+        setTimeout(() => (p.style.display = "none"), 2000);
+      }
+
+      function confirmOrder() {
+        const name = document.getElementById("custName").value;
+        const email = document.getElementById("custEmail").value;
+        const addr = document.getElementById("custAddress").value;
+        if (!name || !email || !addr) {
+          alert("Please complete shipping info!");
+          return;
+        }
+        alert(
+          `🌟 SUCCESS, ${name.toUpperCase()}! 🌟\nOrder placed successfully.\nA confirmation mail has been sent to ${email}.`,
+        );
+        cart = [];
+        updateBadges();
+        goPage(0);
+      }
+    </script>
+  </body>
+</html>
